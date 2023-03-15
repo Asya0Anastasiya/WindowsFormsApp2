@@ -38,8 +38,6 @@ namespace WindowsFormsApp2
             gMapControl1.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance;
             gMapControl1.MaxZoom = 16;
             gMapControl1.Zoom = 4;
-            
-            //gMapControl1.Position = new GMap.NET.PointLatLng(77, 38);
             gMapControl1.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter; 
             gMapControl1.CanDragMap = true; 
             gMapControl1.DragButton = MouseButtons.Left; 
@@ -48,7 +46,7 @@ namespace WindowsFormsApp2
 
          
             TweetsReader tweetsReader = new TweetsReader();
-            List<Tweet> tweets = tweetsReader.HandlingTweets(tweetsReader.ReadTweetsFromFile("weekend_tweets2014.txt"));
+            List<Tweet> tweets = tweetsReader.HandlingTweets(tweetsReader.ReadTweetsFromFile("tweets.txt"));
             Dictionary<string, Newtonsoft.Json.Linq.JArray> states = StatesReader.ReadStates("states.json");
 
             GMapOverlay polygons = new GMapOverlay("polygons");
@@ -60,40 +58,46 @@ namespace WindowsFormsApp2
                 {
                     for (int q = 0; q < states.Values.ElementAt(i).ElementAt(j).Count(); q++)
                     {
-                        for (int w = 0; w < states.Values.ElementAt(i).ElementAt(j).ElementAt(q).Count(); w++)
+                        try
                         {
-                            try
-                            {
-                                points.Add(new PointLatLng((float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(w).Last, (float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(w).First));
-                            }
-                            catch (ArgumentException)
-                            {
-                                for (int a = 0; a < states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(w).Count(); a++)
-                                {
-                                    points.Add(new PointLatLng((float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(w).ElementAt(a).Last, (float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(w).ElementAt(a).First));
-
-                                }
-                                
-                            }
-                           
-                            if (w == 60)
-                            {
-                                int y = 0;
-                            }
-                            //GMapPolygon polygon = new GMapPolygon(points, states.ElementAt(i).Key);
-                            //polygons.Polygons.Add(polygon);
-                            //gMapControl1.Overlays.Add(polygons);
+                            points.Add(new PointLatLng((float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).Last, (float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).First));
                         }
-                        GMapPolygon polygon = new GMapPolygon(points, states.ElementAt(i).Key);
-                        polygons.Polygons.Add(polygon);
-                        gMapControl1.Overlays.Add(polygons);
-                        points.Clear();
-                        //break;
+                        catch (ArgumentException)
+                        {
+                            for (int a = 0; a < states.Values.ElementAt(i).ElementAt(j).ElementAt(q).Count(); a++)
+                            {
+                                points.Add(new PointLatLng((float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(a).Last, (float)states.Values.ElementAt(i).ElementAt(j).ElementAt(q).ElementAt(a).First));
+                            }
+                        }
                     }
-                    //break;
+                    double? color = null;
+                    double? res = 0;
+                    GMapPolygon polygon = new GMapPolygon(points, states.ElementAt(i).Key);
+                    //for (int k = 0; k < tweets.Count; k++)
+                    //{
+                        
+                    //    if (polygon.IsInside(new PointLatLng(tweets[k].location.latitude, tweets[k].location.longitude)))
+                    //    {
+                    //        if (tweets[k].feelings != null) res += tweets[k].feelings;
+                    //    }
+                    //}
+                    //if (res != 0)
+                    //{
+                    //    color = res;
+                    //}
+                    //if (color!= null && color >=0) { polygon.Fill = new SolidBrush(Color.FromArgb(22 * (int)color % 255, 22, 22)); }
+                    //polygon.Fill = new SolidBrush(Color.FromArgb(22 * (int)color, 22, 22));
+                    polygon.Fill = new SolidBrush(Color.FromArgb(1, Color.Aqua));
+                    polygon.Stroke = new Pen(Color.BlueViolet, 1);
+                    polygons.Polygons.Add(polygon);
+                    
+                    gMapControl1.Overlays.Add(polygons);
+                    points.Clear();
                 }
-                break;
             }
+
+
+
             //GMapOverlay markers = new GMapOverlay("markers");
 
             //for (int i = 0; i < tweets.Count; i++)
@@ -106,7 +110,7 @@ namespace WindowsFormsApp2
             //gMapControl1.Overlays.Add(markers);
 
 
-            #region Draw_Polygon
+            #region Draw_Polygon Example
             //GMapOverlay polygons = new GMapOverlay("polygons");
             //List<PointLatLng> points = new List<PointLatLng>();
             //points.Add(new PointLatLng(48.866383, 2.323575));
@@ -119,7 +123,7 @@ namespace WindowsFormsApp2
             #endregion
         }
 
-        #region Draw_Marker
+        #region Draw_Marker Example
         //private void button1_Click(object sender, EventArgs e)
         //{
         //    gMapControl1.ShowCenter = false;
