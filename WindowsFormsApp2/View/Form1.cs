@@ -72,22 +72,37 @@ namespace WindowsFormsApp2
                     }
                     double? color = null;
                     double? res = 0;
+                    bool was = false;
                     GMapPolygon polygon = new GMapPolygon(points, states.ElementAt(i).Key);
-                    //for (int k = 0; k < tweets.Count; k++)
-                    //{
-                        
-                    //    if (polygon.IsInside(new PointLatLng(tweets[k].location.latitude, tweets[k].location.longitude)))
-                    //    {
-                    //        if (tweets[k].feelings != null) res += tweets[k].feelings;
-                    //    }
-                    //}
-                    //if (res != 0)
-                    //{
-                    //    color = res;
-                    //}
-                    //if (color!= null && color >=0) { polygon.Fill = new SolidBrush(Color.FromArgb(22 * (int)color % 255, 22, 22)); }
+                    for (int k = 0; k < tweets.Count; k++)
+                    {
+
+                        if (polygon.IsInside(new PointLatLng(tweets[k].location.latitude, tweets[k].location.longitude)))
+                        {
+                            if (tweets[k].feelings != null) res += tweets[k].feelings;
+                            was = true;
+                        }
+                    }
+                    if (res != 0)
+                    {
+                        color = res;
+                        if (color != null && color > 0)
+                        {
+                            polygon.Fill = new SolidBrush(Color.FromArgb((100 * (int)color) % 255, 140, 0));
+                        }
+                        else if (color != null && color < 0)
+                        {
+                            polygon.Fill = new SolidBrush(Color.FromArgb(140, (138 * (-1) * (int)color) % 255, 0));
+                        }
+                    }
+                    
+                    else if (res == 0 && was)
+                    {
+                        polygon.Fill = new SolidBrush(Color.FromArgb(0,0,0));
+                    } 
+                    else if (res == 0 && !was) polygon.Fill = new SolidBrush(Color.FromArgb(255, 255, 255));
                     //polygon.Fill = new SolidBrush(Color.FromArgb(22 * (int)color, 22, 22));
-                    polygon.Fill = new SolidBrush(Color.FromArgb(1, Color.Aqua));
+                    //polygon.Fill = new SolidBrush(Color.FromArgb(1, Color.Aqua));
                     polygon.Stroke = new Pen(Color.BlueViolet, 1);
                     polygons.Polygons.Add(polygon);
                     
